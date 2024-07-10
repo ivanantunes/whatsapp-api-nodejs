@@ -6,9 +6,7 @@ const {
     DisconnectReason,
     PHONENUMBER_MCC
 } = require('@whiskeysockets/baileys')
-const { unlinkSync } = require('fs')
 const { v4: uuidv4 } = require('uuid')
-const path = require('path')
 const processButton = require('../helper/processbtn')
 const generateVC = require('../helper/genVc')
 const Chat = require('../models/chat.model')
@@ -19,6 +17,7 @@ const logger = require('pino')()
 const useMongoDBAuthState = require('../helper/mongoAuthState')
 const { AuditMessages } = require('./audit')
 const libPhonenumber = require('libphonenumber-js')
+const TypeBot = require('./typebot')
 
 class WhatsAppInstance {
     socketConfig = {
@@ -41,6 +40,7 @@ class WhatsAppInstance {
         messages: [],
         qrRetry: 0,
         customWebhook: '',
+        typebot: null
     }
 
     axiosInstance = axios.create({
@@ -75,13 +75,20 @@ class WhatsAppInstance {
 
     async init() {
         this.collection = mongoClient.db('whatsapp-api').collection(this.key)
-        const { state, saveCreds } = await useMongoDBAuthState(this.collection)
-        this.authState = { state: state, saveCreds: saveCreds }
+        const { state, saveCreds, writeData } = await useMongoDBAuthState(this.collection)
+        this.authState = { state: state, saveCreds: saveCreds, writeData }
         this.socketConfig.auth = this.authState.state
         this.socketConfig.browser = Object.values(config.browser)
         this.instance.sock = makeWASocket(this.socketConfig)
         this.setHandler()
         return this
+    }
+
+    async activeTypeBot(apiHost, typebotname, saveData = true) {
+        const typebot = new TypeBot(apiHost, typebotname, this)
+        this.instance.typebot = typebot
+        if (saveData)
+            await this.authState.writeData(typebot.getObjectToSave(), 'typebot')
     }
 
     setHandler() {
@@ -306,6 +313,22 @@ class WhatsAppInstance {
                     )
                 )
                     await this.SendWebhook('message', webhookData, this.key)
+
+                if (this.instance.typebot) {
+                    if (messageType === 'extendedTextMessage') {
+                        await this.instance.typebot.startTypebot({
+                            message: msg.message.extendedTextMessage.text,
+                            remoteJid: msg.key.remoteJid
+                        })
+                    }
+                    
+                    if (messageType === 'templateButtonReplyMessage') {
+                        await this.instance.typebot.startTypebot({
+                            message: TypeBot.giveMeTextButtonAndIGiveUId(msg.message.templateButtonReplyMessage.selectedDisplayText),
+                            remoteJid: msg.key.remoteJid
+                        })
+                    }
+                }
             })
         })
 
@@ -435,6 +458,10 @@ class WhatsAppInstance {
             phone_connected: this.instance?.online,
             webhookUrl: this.instance.customWebhook,
             user: this.instance?.online ? this.instance.sock?.user : {},
+            typebot: this.instance?.typebot ? {
+                apiHost: this.instance.typebot.apiHost,
+                typebotName: this.instance.typebot.typebotName,
+            } : {},
         }
     }
 

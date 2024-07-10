@@ -140,6 +140,7 @@ module.exports = useMongoDBAuthState = async (collection) => {
         saveCreds: () => {
             return writeData(creds, 'creds')
         },
+        writeData,
         insertData,
         find,
         updateOne

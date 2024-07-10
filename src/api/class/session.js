@@ -31,6 +31,12 @@ class Session {
                             webhook,
                             webhookUrl
                         )
+
+                        const typebotItem = result.find(items => items._id === 'typebot')
+                        if (typebotItem) {
+                            await instance.activeTypeBot(typebotItem.apiHost, typebotItem.typebotName, false)
+                        }
+                        
                         await instance.init()
                         WhatsAppInstances[key] = instance
                     })
