@@ -97,12 +97,17 @@ class TypeBot {
         const { message, remoteJid } = payload
         if (remoteJid === 'status@broadcast') return;
 
+        logger.info(`startTypebot ${remoteJid}`)
         const session = this.findSession(remoteJid)
         if (!session) {
             await this.createNewSession(remoteJid)
         } else {
             await this.continueChat(session, message)
         }
+    }
+
+    clearSessions() {
+        this.sessions = []
     }
 
     findSession(remoteJid) {
@@ -126,7 +131,8 @@ class TypeBot {
                 request.data.clientSideActions,
             )
         } catch (error) {
-            logger.error(error)
+            logger.error(error?.data)
+            this.clearSessions()
         }
     }
 
@@ -193,7 +199,24 @@ class TypeBot {
             }
 
             if (message.type === 'image') {
-                await instance.sendMediaFile('to', message.content, 'image', message.caption)
+                await instance.sendUrlMediaFile(
+                    remoteJid,
+                    message.content.url,
+                    'image',
+                    '',
+                    'teste'
+                )
+            }
+
+            if (message.type === 'video') {
+                
+                console.log(message)
+                // url youtube
+                console.log(message.content.type)
+            }
+
+            if (message.type === 'audio') {
+                console.log(message)
             }
         }
 
@@ -221,6 +244,16 @@ class TypeBot {
                 }
 
             }
+
+            if (input.type === 'text input') {
+                const label = input?.options?.labels?.placeholder || 'Sem titulo para o input definido'
+                await instance.sendTextMessage(
+                    remoteJid,
+                    label
+                )
+            }
+            // email input
+            console.log('input type', input.type)
         }
     }
 }

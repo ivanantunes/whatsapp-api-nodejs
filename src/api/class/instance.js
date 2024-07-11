@@ -315,9 +315,18 @@ class WhatsAppInstance {
                     await this.SendWebhook('message', webhookData, this.key)
 
                 if (this.instance.typebot) {
+                    // extendedTextMessage quando recebe mensagem do web-whatsapp
                     if (messageType === 'extendedTextMessage') {
                         await this.instance.typebot.startTypebot({
                             message: msg.message.extendedTextMessage.text,
+                            remoteJid: msg.key.remoteJid
+                        })
+                    }
+
+                    // conversation quando recebe mensagem do celular
+                    if (messageType === 'conversation') {
+                        await this.instance.typebot.startTypebot({
+                            message: msg.message.conversation,
                             remoteJid: msg.key.remoteJid
                         })
                     }
@@ -504,8 +513,9 @@ class WhatsAppInstance {
     async sendUrlMediaFile(to, url, type, mimeType, caption = '') {
         await this.verifyId(this.getWhatsAppId(to))
 
+        const receiver = this.getWhatsAppId(to)
         const data = await this.instance.sock?.sendMessage(
-            this.getWhatsAppId(to),
+            receiver,
             {
                 [type]: {
                     url: url,
