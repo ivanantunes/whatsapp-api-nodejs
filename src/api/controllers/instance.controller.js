@@ -32,14 +32,16 @@ exports.addTypeBot = async (req, res) => {
     const { name, apiHost } = req.body.typebot
     const instance = WhatsAppInstances[key]
     if (!instance) {
-        return res.json({
-            error: true,
-            message: 'Instance not found',
-        })
+        return res
+            .status(422)
+            .json({
+                error: true,
+                message: 'Instance not found',
+            })
     }
 
     await instance.activeTypeBot(apiHost, name)
-    
+
     res.json({
         error: false,
         message: 'Typebot added successfully',
