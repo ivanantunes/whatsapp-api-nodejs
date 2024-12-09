@@ -60,8 +60,8 @@ module.exports = {
         url: MONGODB_URL,
         options: {
             // useCreateIndex: true,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
+            // useNewUrlParser: true,
+            // useUnifiedTopology: true,
         },
     },
     browser: {
