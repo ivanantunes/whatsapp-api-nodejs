@@ -252,6 +252,14 @@ class TypeBot {
                     label
                 )
             }
+
+            if (input.type === 'phone number input') {
+                const label = input?.options?.labels?.placeholder || 'Sem titulo para o input definido'
+                await instance.sendTextMessage(
+                    remoteJid,
+                    label
+                )
+            }
             // email input
             console.log('input type', input.type)
         }
