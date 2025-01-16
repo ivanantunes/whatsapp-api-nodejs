@@ -1,4 +1,5 @@
 const { default: axios } = require("axios");
+const sleep = require("../helper/sleep");
 const logger = require('pino')()
 
 const mapButtonsAndIds = []
@@ -131,7 +132,19 @@ class TypeBot {
                 request.data.clientSideActions,
             )
         } catch (error) {
-            logger.error(error?.data)
+            logger.error(error?.response?.data)
+            if (error.name === 'AxiosError') {
+                const errorData = error.response.data
+                if (errorData.message = "Session not found.") {
+                    this.clearSessions()   
+                    await this.createNewSession(sessionData.remoteJid)
+                    const session = this.findSession(sessionData.remoteJid)
+                    setTimeout(async () => {
+                        await this.continueChat(session, message)
+                    }, 2000)
+                    return
+                }
+            }
             this.clearSessions()
         }
     }
@@ -179,6 +192,16 @@ class TypeBot {
     }
 
     async processMessages(remoteJid, instance, messages, input, clientSideActions, applyFormatting) {
+        if (clientSideActions) {
+            for (const clientActions of clientSideActions) {
+                if (clientActions.type === 'wait') {
+                    const time = clientActions.wait.secondsToWaitFor * 1000
+                    logger.info(`awaiting ${time} seconds`)
+                    await sleep(time)
+                }
+            }
+        }
+
         for (const message of messages) {
 
             if (message.type === 'text') {
