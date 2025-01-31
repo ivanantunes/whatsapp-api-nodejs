@@ -70,7 +70,7 @@ class WhatsAppInstance {
                 body,
                 instanceKey: key,
             })
-            .catch(() => {})
+            .catch(() => { })
     }
 
     async init() {
@@ -330,10 +330,18 @@ class WhatsAppInstance {
                             remoteJid: msg.key.remoteJid
                         })
                     }
-                    
+
                     if (messageType === 'templateButtonReplyMessage') {
                         await this.instance.typebot.startTypebot({
                             message: TypeBot.giveMeTextButtonAndIGiveUId(msg.message.templateButtonReplyMessage.selectedDisplayText),
+                            remoteJid: msg.key.remoteJid
+                        })
+                    }
+
+                    if (messageType === 'locationMessage') {
+                        const locationString = `${msg.message.locationMessage.degreesLatitude},${msg.message.locationMessage.degreesLongitude}`
+                        await this.instance.typebot.startTypebot({
+                            message: locationString,
                             remoteJid: msg.key.remoteJid
                         })
                     }
@@ -343,7 +351,7 @@ class WhatsAppInstance {
 
         sock?.ev.on('messages.update', async (messages) => {
             messages.forEach(element => {
-                AuditMessages.update(element)  
+                AuditMessages.update(element)
             })
         })
 
@@ -1061,9 +1069,9 @@ class WhatsAppInstance {
         registration.phoneNumberCountryCode = parsedNumber.countryCallingCode
         registration.phoneNumberNationalNumber = parsedNumber.nationalNumber
         const mcc = PHONENUMBER_MCC[parsedNumber.countryCallingCode]
-        if(!mcc) {
-			throw new Error('Could not find MCC for phone number: ' + phoneNumber + '\nPlease specify the MCC manually.')
-		}
+        if (!mcc) {
+            throw new Error('Could not find MCC for phone number: ' + phoneNumber + '\nPlease specify the MCC manually.')
+        }
 
         registration.phoneNumberMobileCountryCode = mcc
         registration.identityId = Buffer.from(registration.phoneNumber, 'utf-8')
