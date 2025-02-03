@@ -11,8 +11,14 @@ const swaggerOptions = {
         },
         servers: [
             {
+
                 url: 'http://localhost:3333',
+                description: 'Local server'
             },
+            {
+                url: 'https://whatsapp-api-da7eccbe4a89.herokuapp.com',
+                description: 'Production server'
+            }
         ],
     },
     apis: ['./src/api/routes/*.js'], // Adjust the path to your route files
