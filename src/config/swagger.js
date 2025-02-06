@@ -8,10 +8,14 @@ const swaggerOptions = {
             title: 'Free Whatsapp API',
             version: '1.0.0',
             description: 'API documentation',
+            contact: {
+                name: 'Jeanluca FP',
+                url: 'https://github.com/Jean1dev',
+                email: 'jeanlucafp@gmail.com'
+            }
         },
         servers: [
             {
-
                 url: 'http://localhost:3333',
                 description: 'Local server'
             },
@@ -20,6 +24,21 @@ const swaggerOptions = {
                 description: 'Production server'
             }
         ],
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                    description: "Enter 'Bearer' [space] and then your token"
+                }
+            }
+        },
+        security: [
+            {
+                BearerAuth: []
+            }
+        ]
     },
     apis: ['./src/api/routes/*.js'], // Adjust the path to your route files
 };

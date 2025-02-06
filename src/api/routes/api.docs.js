@@ -1,5 +1,20 @@
 /**
  * @swagger
+ * securityDefinitions:
+ *   Bearer:
+ *     type: apiKey
+ *     name: Authorization
+ *     in: header
+ *     description: Enter 'Bearer' [space] and then your token
+ */
+
+/**
+ * @swagger
+ * security:
+ *   - Bearer: []
+ */
+/**
+ * @swagger
  * tags:
  *   name: Instance
  *   description: Instances accounts management
