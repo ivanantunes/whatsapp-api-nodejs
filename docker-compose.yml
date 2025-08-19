@@ -24,8 +24,11 @@ services:
             - PORT=3333
             - MONGODB_ENABLED=true
             - MONGODB_URL=mongodb://mongodb:27017
-            - WEBHOOK_ENABLED=false
+            - WEBHOOK_ENABLED=true
+            - WEBHOOK_URL=http://127.0.0.1:3000/webhook/whatsapp
             - LOG_LEVEL=trace
+            - RESTORE_SESSIONS_ON_START_UP=true
+            - WEBHOOK_ALLOWED_EVENTS=messages
         volumes:
             - ./:/home/node/app
             - /home/node/app/node_modules/
