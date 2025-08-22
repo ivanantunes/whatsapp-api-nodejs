@@ -1,6 +1,6 @@
 FROM node:24-alpine
 
-ARG _WORKDIR=/home/node/app
+ARG _WORKDIR=/home/node/whatsapp
 ARG PORT=3333
 ENV MONGODB_URL=mongodb://mongo:27017/whatsapp_api
 

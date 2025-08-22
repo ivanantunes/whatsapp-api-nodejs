@@ -8,8 +8,8 @@ services:
             - 27017:27017
         volumes:
             - db:/data/db
-    app:
-        container_name: api
+    whatsapp:
+        container_name: whatsapp
         build:
             context: .
             dockerfile: Dockerfile
@@ -30,8 +30,8 @@ services:
             - RESTORE_SESSIONS_ON_START_UP=true
             - WEBHOOK_ALLOWED_EVENTS=messages
         volumes:
-            - ./:/home/node/app
-            - /home/node/app/node_modules/
+            - ./:/home/node/whatsapp
+            - /home/node/whatsapp/node_modules/
 
 volumes:
     db:
